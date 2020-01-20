@@ -99,15 +99,21 @@ while game == 1:
     else:
         screen.blit(red_button1, (620, 730))
     pygame.draw.rect(screen, (0, 0, 0), (662, 79, 401, 600))
+    #отрисовка уже лежащих
     for i in range(len(bricks)):
         for j in range(len(bricks[i])):
             if bricks[i][j] != 0:
                 pygame.draw.rect(screen, bricks[i][j], (663 + i * 20, 79 + j * 20, 19, 19))
-
+    #сетка
+    for i in range(1, 20):
+        pygame.draw.line(screen, (100, 100, 100), (662 + i*20, 78), (662 + i * 20, 678))
+    for i in range(1, 30):
+        pygame.draw.line(screen, (100, 100, 100), (662, 78 + i * 20), (1062, 78 + i * 20))
+    #####
     for i in figure[type]:
         if pos[1] + i[1] >= 0:
             pygame.draw.rect(screen, color, (663 + (i[0] + pos[0]) * 20, 79 + (i[1] + pos[1]) * 20, 19, 19))
-    #
+    ##########
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
