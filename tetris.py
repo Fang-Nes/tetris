@@ -3,8 +3,15 @@ import pygame, random
 pygame.init()
 screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 pygame.display.set_caption('Tetris')
-tetris_fon = pygame.image.load("tetris_fon.png")
+tetris_fon = pygame.image.load("pictures/tetris_fon.png")
+tick = pygame.transform.scale(pygame.image.load("pictures/tick.png"), (100, 100))
+dagger = pygame.transform.scale(pygame.image.load("pictures/dagger.png"), (100, 100))
+data_now = []
 data = []
+nick = ""
+with open('data.txt', 'r')as f:
+    for i in f.readlines():
+        data.append(eval(i))
 
 
 #функция для написания текста
@@ -29,6 +36,7 @@ figures = (
     #кривая
     (((-1, 0), (0, 0), (0, 1), (1, 1)), ((1, -1), (1, 0), (0, 0), (0, 1)))
 )
+
 
 #отрисовка игры
 def drawer(score, rows, next_figure, next_type, next_color, bricks, figure, type, pos, color):
@@ -61,8 +69,8 @@ def drawer(score, rows, next_figure, next_type, next_color, bricks, figure, type
 
 
 #сама игра
-def game(data):
-    if len(data) == 0:
+def game(data_now):
+    if len(data_now) == 0:
         figure = random.choice(figures)
         next_figure = random.choice(figures)
         type = random.randint(0, len(figure) - 1)
@@ -78,17 +86,17 @@ def game(data):
         score = 0
         rows = 0
     else:
-        score = data[0]
-        rows = data[1]
-        next_figure = data[2]
-        next_type = data[3]
-        next_color = data[4]
-        bricks = data[5]
-        figure = data[6]
-        type = data[7]
-        pos = data[8]
-        color = data[9]
-        pygame.time.set_timer(data[10][0], data[10][1])
+        score = data_now[0]
+        rows = data_now[1]
+        next_figure = data_now[2]
+        next_type = data_now[3]
+        next_color = data_now[4]
+        bricks = data_now[5]
+        figure = data_now[6]
+        type = data_now[7]
+        pos = data_now[8]
+        color = data_now[9]
+        pygame.time.set_timer(data_now[10][0], data_now[10][1])
 
     while True:
         x, y = pygame.mouse.get_pos()
@@ -101,7 +109,8 @@ def game(data):
             # все события на клавиатуру
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    return score, rows, next_figure, next_type, next_color, bricks, figure, type, pos, color, [30, 600]
+                    return [score, rows, next_figure, next_type, next_color,
+                            bricks, figure, type, pos, color, [30, 600], 0]
                 if event.key == pygame.K_RIGHT:
                     pos[0] += 1
                     for i in figure[type]:
@@ -176,6 +185,43 @@ def game(data):
                     for i1 in range(i, 0, -1):
                         for j1 in range(0, 20):
                             bricks[j1][i1] = bricks[j1][i1 - 1]
+        for i in bricks:
+            if i[0] != 0:
+                return [score, rows, next_figure, next_type, next_color,
+                            bricks, figure, type, pos, color, [30, 600], 1]
+
+
+def saver():
+    nickname = ""
+    while True:
+        x, y = pygame.mouse.get_pos()
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, (255, 255, 255), (740, 400, 440, 220))
+        pygame.draw.rect(screen, (0, 0, 0), (750, 430, 420, 60), 1)
+        write(nickname, (0, 0, 0), (755, 440), 70)
+        screen.blit(tick, (790, 510))
+        screen.blit(dagger, (1010, 510))
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if (abs(x - 840) ** 2 + abs(y - 560) ** 2) ** 0.5 <= 50:
+                    return nickname
+                if (abs(x - 1060) ** 2 + abs(y - 560) ** 2) ** 0.5 <= 50:
+                    return
+            if event.type == pygame.KEYDOWN:
+                if event.key == 8:
+                    nickname = nickname[:-1]
+                else:
+                    l = chr(event.key)
+                    if pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                        l = l.upper()
+                    if event.key != 304:
+                        nickname += l
+        pygame.display.flip()
+
+
+def loader():
+    pass
+
 
 #начальное окно
 while True:
@@ -215,18 +261,30 @@ while True:
         write("EXIT", (80, 80, 80), (870, 910), 100)
         ext = 1
 
+
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
             if ext:
+                with open('data.txt', 'w')as f:
+                    for i in data:
+                        f.write(str(i) + '\n')
                 exit()
             if play:
-                data = game(data)
-            if save:
-                with open('data', 'w')as f:
-                    f.write(str(data))
+                data_now = game(data_now)
+                if data_now[11] == 1:
+                    ##################
+
+                    #ДОБАВИТЬ ДОБАВЛЕНИЕ В ТОП ЛИСТ!!!!
+
+                    ##################
+                    data_now = []
+            if save and len(data_now) != 0:
+                nick = saver()
+                if nick != "":
+                    data_now.append(nick)
+                    data.append(str(data_now))
             if download:
-                with open('data', 'r') as f:
-                    data = eval(f.readline())
+                data_now = loader()
     pygame.display.flip()
 
 
