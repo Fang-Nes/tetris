@@ -219,8 +219,48 @@ def saver():
         pygame.display.flip()
 
 
-def loader():
-    pass
+def loader(data_now):
+    k = 0
+    choosed = -1
+    while True:
+        x, y = pygame.mouse.get_pos()
+        screen.fill((0, 0, 0))
+        pygame.draw.rect(screen, (255, 255, 255), (600, 0, 720, 1080))
+        if 600 < x < 1320 and y < 936 and (y - 1) // 72 < len(data):
+            pygame.draw.rect(screen, (190, 190, 190), (601, 1 + (y - 1) // 72 * 72, 718, 71))
+        for i in range(len(data)):
+            if i + k == choosed:
+                pygame.draw.rect(screen, (100, 100, 100), (601, 1 + i * 72, 718, 71))
+            else:
+                pygame.draw.rect(screen, (100, 100, 100), (601, 1 + i * 72, 718, 71), 1)
+            write(data[i][-1], (0, 0, 0), (605, 13 + (i + k) * 72), 70)
+        pygame.draw.rect(screen, (255, 255, 255), (600, 936, 720, 144))
+        screen.blit(tick, (650, 960))
+        screen.blit(dagger, (1140, 960))
+        pygame.draw.rect(screen, (255, 0, 0), (800, 960, 300, 100))
+        write("DELETE", (0, 0, 0), (810, 975), 100)
+        if 800 < x < 1100 and 960 < y < 1060:
+            pygame.draw.rect(screen, (100, 100, 100), (800, 960, 300, 100), 3)
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if 600 < x < 1320 and y < 936 and (y - 1) // 72 < len(data):
+                        choosed = (y - 1) // 72 + k
+
+                    if (abs(x - 1180) ** 2 + abs(y - 1010) ** 2) ** 0.5 <= 50:
+                        return data_now
+                    if 800 < x < 1100 and 960 < y < 1060 and choosed != -1:
+                        del data[choosed]
+                    if (abs(x - 710) ** 2 + abs(y - 1010) ** 2) ** 0.5 <= 50 and choosed != -1:
+                        return data[choosed]
+                if event.button == 4 and k < 0:
+                    k += 1
+                if event.button == 5:
+                    if abs(k) < len(data) - 13:
+                        k -= 1
+            if event.type == pygame.KEYDOWN:
+                return
+        pygame.display.flip()
 
 
 #начальное окно
@@ -230,35 +270,35 @@ while True:
     x, y = pygame.mouse.get_pos()
 
     play = 0
-    pygame.draw.rect(screen, (255, 255, 255), (750, 80, 420, 120))
-    write("PLAY", (0, 0, 0), (870, 110), 100)
+    pygame.draw.rect(screen, (255, 255, 255), (750, 70, 420, 120))
+    write("PLAY", (0, 0, 0), (870, 100), 100)
     if 750 < x < 1170 and 80 < y < 200:
-        pygame.draw.rect(screen, (180, 180, 180), (750, 80, 420, 120))
-        write("PLAY", (80, 80, 80), (870, 110), 100)
+        pygame.draw.rect(screen, (180, 180, 180), (750, 70, 420, 120))
+        write("PLAY", (80, 80, 80), (870, 100), 100)
         play = 1
 
     save = 0
-    pygame.draw.rect(screen, (255, 255, 255), (750, 280, 420, 120))
-    write("SAVE", (0, 0, 0), (870, 310), 100)
+    pygame.draw.rect(screen, (255, 255, 255), (750, 250, 420, 120))
+    write("SAVE", (0, 0, 0), (870, 280), 100)
     if 750 < x < 1170 and 280 < y < 400:
-        pygame.draw.rect(screen, (180, 180, 180), (750, 280, 420, 120))
-        write("SAVE", (80, 80, 80), (870, 310), 100)
+        pygame.draw.rect(screen, (180, 180, 180), (750, 250, 420, 120))
+        write("SAVE", (80, 80, 80), (870, 280), 100)
         save = 1
 
     download = 0
-    pygame.draw.rect(screen, (255, 255, 255), (750, 480, 420, 120))
-    write("DOWNLOAD", (0, 0, 0), (750, 510), 100)
+    pygame.draw.rect(screen, (255, 255, 255), (750, 430, 420, 120))
+    write("DOWNLOAD", (0, 0, 0), (750, 460), 100)
     if 750 < x < 1170 and 480 < y < 600:
-        pygame.draw.rect(screen, (180, 180, 180), (750, 480, 420, 120))
-        write("DOWNLOAD", (80, 80, 80), (750, 510), 100)
+        pygame.draw.rect(screen, (180, 180, 180), (750, 430, 420, 120))
+        write("DOWNLOAD", (80, 80, 80), (750, 460), 100)
         download = 1
 
     ext = 0
-    pygame.draw.rect(screen, (255, 255, 255), (750, 880, 420, 120))
-    write("EXIT", (0, 0, 0), (870, 910), 100)
+    pygame.draw.rect(screen, (255, 255, 255), (750, 890, 420, 120))
+    write("EXIT", (0, 0, 0), (870, 920), 100)
     if 750 < x < 1170 and 880 < y < 1000:
-        pygame.draw.rect(screen, (180, 180, 180), (750, 880, 420, 120))
-        write("EXIT", (80, 80, 80), (870, 910), 100)
+        pygame.draw.rect(screen, (180, 180, 180), (750, 890, 420, 120))
+        write("EXIT", (80, 80, 80), (870, 920), 100)
         ext = 1
 
 
@@ -282,29 +322,7 @@ while True:
                 nick = saver()
                 if nick != "":
                     data_now.append(nick)
-                    data.append(str(data_now))
+                    data.append(data_now)
             if download:
-                data_now = loader()
+                data_now = loader(data_now)
     pygame.display.flip()
-
-
-#############################
-
-#     write('score:'+str(score), (255, 255, 255), (0, 0), 25)
-#     for i in bricks:
-#         if i[0] != 0:
-#             game = 2
-#     pygame.display.flip()
-# for i in range(len(bricks)):
-#     for m in range(len(bricks[i])):
-#         if bricks[i][m] != 0:
-#             pygame.draw.rect(screen, bricks[i][m], (i * 20, m * 20, 19, 19))
-# write('score:' + str(score), (255, 255, 255), (None, 330))
-# while game == 2:
-#     pygame.display.flip()
-#     for event in pygame.event.get():
-#         if event.type == pygame.MOUSEBUTTONDOWN:
-#             if event.button == 1:
-#                 game = 0
-#         if event.type == pygame.QUIT:
-#             exit()
