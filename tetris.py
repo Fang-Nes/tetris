@@ -9,6 +9,9 @@ dagger = pygame.transform.scale(pygame.image.load("pictures/dagger.png"), (100, 
 data_now = []
 data = []
 nick = ""
+pygame.mixer.music.load('tetris.mp3')
+pygame.mixer.music.play()
+pygame.time.set_timer(31, 180000)
 with open('data.txt', 'r')as f:
     for i in f.readlines():
         data.append(eval(i))
@@ -69,8 +72,8 @@ def drawer(score, rows, next_figure, next_type, next_color, bricks, figure, type
 
 
 #сама игра
-def game(data_now):
-    if len(data_now) == 0:
+def game(data_now1):
+    if len(data_now1) == 0:
         figure = random.choice(figures)
         next_figure = random.choice(figures)
         type = random.randint(0, len(figure) - 1)
@@ -86,23 +89,25 @@ def game(data_now):
         score = 0
         rows = 0
     else:
-        score = data_now[0]
-        rows = data_now[1]
-        next_figure = data_now[2]
-        next_type = data_now[3]
-        next_color = data_now[4]
-        bricks = data_now[5]
-        figure = data_now[6]
-        type = data_now[7]
-        pos = data_now[8]
-        color = data_now[9]
-        pygame.time.set_timer(data_now[10][0], data_now[10][1])
+        score = data_now1[0]
+        rows = data_now1[1]
+        next_figure = tuple(data_now1[2])
+        next_type = data_now1[3]
+        next_color = tuple(data_now1[4])
+        bricks = data_now1[5].copy()
+        figure = tuple(data_now1[6])
+        type = data_now1[7]
+        pos = data_now1[8].copy()
+        color = tuple(data_now1[9])
+        pygame.time.set_timer(data_now1[10][0], data_now1[10][1])
 
     while True:
         x, y = pygame.mouse.get_pos()
         # отрисовка элементов
         drawer(score, rows, next_figure, next_type, next_color, bricks, figure, type, pos, color)
         for event in pygame.event.get():
+            if event.type == 31:
+                pygame.mixer.music.play()
             if event.type == 30:
                 pos[1] += 1
             # события на кнопки мыши
@@ -202,6 +207,8 @@ def saver():
         screen.blit(tick, (790, 510))
         screen.blit(dagger, (1010, 510))
         for event in pygame.event.get():
+            if event.type == 31:
+                pygame.mixer.music.play()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if (abs(x - 840) ** 2 + abs(y - 560) ** 2) ** 0.5 <= 50:
                     return nickname
@@ -219,7 +226,7 @@ def saver():
         pygame.display.flip()
 
 
-def loader(data_now):
+def loader(data_now1):
     k = 0
     choosed = -1
     while True:
@@ -242,17 +249,19 @@ def loader(data_now):
         if 800 < x < 1100 and 960 < y < 1060:
             pygame.draw.rect(screen, (100, 100, 100), (800, 960, 300, 100), 3)
         for event in pygame.event.get():
+            if event.type == 31:
+                pygame.mixer.music.play()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if 600 < x < 1320 and y < 936 and (y - 1) // 72 < len(data):
                         choosed = (y - 1) // 72 + k
 
                     if (abs(x - 1180) ** 2 + abs(y - 1010) ** 2) ** 0.5 <= 50:
-                        return data_now
+                        return data_now1.copy()
                     if 800 < x < 1100 and 960 < y < 1060 and choosed != -1:
                         del data[choosed]
                     if (abs(x - 710) ** 2 + abs(y - 1010) ** 2) ** 0.5 <= 50 and choosed != -1:
-                        return data[choosed]
+                        return data[choosed].copy()
                 if event.button == 4 and k < 0:
                     k += 1
                 if event.button == 5:
@@ -301,8 +310,9 @@ while True:
         write("EXIT", (80, 80, 80), (870, 920), 100)
         ext = 1
 
-
     for event in pygame.event.get():
+        if event.type == 31:
+            pygame.mixer.music.play()
         if event.type == pygame.MOUSEBUTTONDOWN:
             if ext:
                 with open('data.txt', 'w')as f:
@@ -310,7 +320,7 @@ while True:
                         f.write(str(i) + '\n')
                 exit()
             if play:
-                data_now = game(data_now)
+                data_now = game(data_now.copy())
                 if data_now[11] == 1:
                     ##################
 
@@ -322,7 +332,7 @@ while True:
                 nick = saver()
                 if nick != "":
                     data_now.append(nick)
-                    data.append(data_now)
+                    data.append(data_now.copy())
             if download:
-                data_now = loader(data_now)
+                data_now = loader(data_now.copy())
     pygame.display.flip()
