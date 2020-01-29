@@ -11,25 +11,31 @@ data = []
 nick = ""
 pygame.mixer.music.load('tetris.mp3')
 pygame.mixer.music.play()
+line = pygame.mixer.Sound('line.wav')
+fall = pygame.mixer.Sound('fall.wav')
 pygame.time.set_timer(31, 180000)
 try:
     with open('data.txt', 'r')as f:
         for i in f.readlines():
             data.append(eval(i))
 except:
-    with open('data.txt','w')as f:pass
+    with open('data.txt','w')as f:
+        pass
+
+
+#функция для копирования двух(и более)мерного массива
+def get_copy(mas):
+    if type(mas) not in (tuple, list):
+        return mas
+    self = []
+    for i in mas:
+        self.append(get_copy(i))
+    if type(self) == tuple:
+        now = tuple(self)
+    return self
 
 
 #функция для написания текста
-
-def get_copy(mas):
-    if type(mas) not in (tuple,list):return mas
-    self=[]
-    for i in mas:
-        self.append(get_copy(i))
-    if type(self)==tuple:now=tuple(self)
-    return self
-
 def write(text, color, pos, size=75):
     font = pygame.font.Font(None, size)
     pos = list(pos)
@@ -172,6 +178,7 @@ def game(data_now1):
         # проверка на то, легла фигура или нет
         for i in figure[type]:
             if i[1] + pos[1] > 29 or bricks[i[0] + pos[0]][i[1] + pos[1]] != 0:
+                fall.play()
                 for j in figure[type]:
                     bricks[j[0] + pos[0]][j[1] + pos[1] - 1] = color
                 score += 10
@@ -196,6 +203,7 @@ def game(data_now1):
                     else:
                         break
                 if busy == 20:
+                    line.play()
                     score += 100
                     rows += 1
                     more = True
@@ -293,7 +301,7 @@ while True:
     play = 0
     pygame.draw.rect(screen, (255, 255, 255), (750, 70, 420, 120))
     write("PLAY", (0, 0, 0), (870, 100), 100)
-    if 750 < x < 1170 and 80 < y < 200:
+    if 750 < x < 1170 and 70 < y < 190:
         pygame.draw.rect(screen, (180, 180, 180), (750, 70, 420, 120))
         write("PLAY", (80, 80, 80), (870, 100), 100)
         play = 1
@@ -301,7 +309,7 @@ while True:
     save = 0
     pygame.draw.rect(screen, (255, 255, 255), (750, 250, 420, 120))
     write("SAVE", (0, 0, 0), (870, 280), 100)
-    if 750 < x < 1170 and 280 < y < 400:
+    if 750 < x < 1170 and 250 < y < 370:
         pygame.draw.rect(screen, (180, 180, 180), (750, 250, 420, 120))
         write("SAVE", (80, 80, 80), (870, 280), 100)
         save = 1
@@ -309,7 +317,7 @@ while True:
     download = 0
     pygame.draw.rect(screen, (255, 255, 255), (750, 430, 420, 120))
     write("DOWNLOAD", (0, 0, 0), (750, 460), 100)
-    if 750 < x < 1170 and 480 < y < 600:
+    if 750 < x < 1170 and 450 < y < 550:
         pygame.draw.rect(screen, (180, 180, 180), (750, 430, 420, 120))
         write("DOWNLOAD", (80, 80, 80), (750, 460), 100)
         download = 1
@@ -317,7 +325,7 @@ while True:
     ext = 0
     pygame.draw.rect(screen, (255, 255, 255), (750, 890, 420, 120))
     write("EXIT", (0, 0, 0), (870, 920), 100)
-    if 750 < x < 1170 and 880 < y < 1000:
+    if 750 < x < 1170 and 890 < y < 1010:
         pygame.draw.rect(screen, (180, 180, 180), (750, 890, 420, 120))
         write("EXIT", (80, 80, 80), (870, 920), 100)
         ext = 1
