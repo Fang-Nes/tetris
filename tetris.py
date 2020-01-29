@@ -12,12 +12,24 @@ nick = ""
 pygame.mixer.music.load('tetris.mp3')
 pygame.mixer.music.play()
 pygame.time.set_timer(31, 180000)
-with open('data.txt', 'r')as f:
-    for i in f.readlines():
-        data.append(eval(i))
+try:
+    with open('data.txt', 'r')as f:
+        for i in f.readlines():
+            data.append(eval(i))
+except:
+    with open('data.txt','w')as f:pass
 
 
 #функция для написания текста
+
+def get_copy(mas):
+    if type(mas) not in (tuple,list):return mas
+    self=[]
+    for i in mas:
+        self.append(get_copy(i))
+    if type(self)==tuple:now=tuple(self)
+    return self
+
 def write(text, color, pos, size=75):
     font = pygame.font.Font(None, size)
     pos = list(pos)
@@ -320,7 +332,7 @@ while True:
                         f.write(str(i) + '\n')
                 exit()
             if play:
-                data_now = game(data_now.copy())
+                data_now = game(get_copy(data_now))
                 if data_now[11] == 1:
                     ##################
 
@@ -332,7 +344,7 @@ while True:
                 nick = saver()
                 if nick != "":
                     data_now.append(nick)
-                    data.append(data_now.copy())
+                    data.append(get_copy(data_now))
             if download:
-                data_now = loader(data_now.copy())
+                data_now = loader(get_copy(data_now))
     pygame.display.flip()
